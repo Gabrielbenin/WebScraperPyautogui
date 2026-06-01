@@ -1,0 +1,16 @@
+# Local browser data
+BotChromeProfile/
+
+# Logs
+*.log
+
+# Conversation history - do not commit
+historico_conversa.txt
+
+# Archives
+*.zip
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo

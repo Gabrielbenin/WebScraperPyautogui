@@ -2,7 +2,7 @@
 // @name         Marketplaces - Matador Definitivo (V11.0 - Blindagem Total)
 // @namespace    http://tampermonkey.net/
 // @version      11.0
-// @description  Triturador de texto sem acentos e Vigia Imortal (MutationObserver) para não falhar na Americanas.
+// @description  Text normalizer and Immortal Watcher (MutationObserver) to reliably detect unavailable products and own-brand listings.
 // @author       Você
 // @match        *://*/*
 // @grant        window.close
@@ -72,10 +72,10 @@
     // =====================================================================
     // 2. REGRAS DE VENDEDORES (Também compactadas)
     // =====================================================================
-    const lojasBanidas = ["madeiramadeira", "madeiramadeira1", "casatema"];
+    const bannedSellers = ["ownstore", "officialstore", "casatema"];
     const prefixos = ["vendidopor", "vendidoeentreguepor", "lojaoficial", "entreguepor", "vendidoporeentreguepor"];
-    let frasesProibidas = [];
-    prefixos.forEach(p => lojasBanidas.forEach(l => frasesProibidas.push(p + l)));
+    let bannedPhrases = [];
+    prefixos.forEach(p => bannedSellers.forEach(l => bannedPhrases.push(p + l)));
 
     const seletoresVendedor = [
         '.product-seller__name', '.seller-name__link', '.product-marketplace-sellers', // Leroy
@@ -107,7 +107,7 @@
         const caixinhasVendedor = document.querySelectorAll(seletoresVendedor.join(','));
         for (let caixa of caixinhasVendedor) {
             let textoCaixa = padronizarTexto(caixa.textContent);
-            if (lojasBanidas.some(loja => textoCaixa.includes(loja))) {
+            if (bannedSellers.some(seller => textoCaixa.includes(seller))) {
                 console.log("[Matador] Loja banida encontrada na caixinha! Fechando...");
                 window.close();
                 return;
@@ -115,8 +115,8 @@
         }
 
         // --- CHECAGEM C: TEXTO DO VENDEDOR LIVRE ---
-        for (let i = 0; i < frasesProibidas.length; i++) {
-            if (textoCompactado.includes(frasesProibidas[i])) {
+        for (let i = 0; i < bannedPhrases.length; i++) {
+            if (textoCompactado.includes(bannedPhrases[i])) {
                 console.log("[Matador] Loja banida encontrada no texto livre! Fechando...");
                 window.close();
                 return;

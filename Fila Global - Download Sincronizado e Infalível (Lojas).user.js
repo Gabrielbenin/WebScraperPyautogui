@@ -1,9 +1,9 @@
-// ==UserScript==
-// @name         Fila Global - Download Sincronizado e Infalível (Lojas)
+﻿// ==UserScript==
+// @name         Fila Global - Download Sincronizado e InfalÃ­vel (Lojas)
 // @namespace    http://tampermonkey.net/
 // @version      8.0
-// @description  Garante o download físico real das imagens via Blobs antes de registrar no CSV e fechar as abas. Suporte total a MadeiraMadeira.
-// @author       Você
+// @description  Guarantees real physical download of product images via Blobs before recording to CSV and closing tabs. Full e-commerce support.
+// @author       VocÃª
 // @match        *://*.americanas.com.br/*
 // @match        *://*.amazon.com.br/*
 // @match        *://*.amazon.com/*
@@ -11,7 +11,7 @@
 // @match        *://*.leroymerlin.com.br/*
 // @match        *://*.casasbahia.com.br/*
 // @match        *://*.magazineluiza.com.br/*
-// @match        *://*.madeiramadeira.com.br/*
+
 // @grant        GM_download
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -25,18 +25,17 @@
     const idDestaAba = 'aba_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
     const ID_BOTAO_PAINEL = 'tm-painel-fila-container';
 
-    // Função para caçar o ID na MadeiraMadeira
-    function buscarIdMadeira() {
-        if (!window.location.href.includes('madeiramadeira.com.br')) return '';
-        let elementos = document.querySelectorAll('span, p, div, b, strong');
-        for (let el of elementos) {
-            let texto = el.innerText || el.textContent;
-            if (texto && texto.includes('ID:')) {
-                let match = texto.match(/ID:\s*(\d+)/i);
+    // Function to extract the product ID from the current e-commerce page
+    function fetchProductId() {
+        let elements = document.querySelectorAll('span, p, div, b, strong');
+        for (let el of elements) {
+            let text = el.innerText || el.textContent;
+            if (text && text.includes('ID:')) {
+                let match = text.match(/ID:\s*(\d+)/i);
                 if (match && match[1]) return match[1];
             }
         }
-        return 'ID não encontrado';
+        return 'ID not found';
     }
 
     // Busca inteligente da imagem do produto (og:image / Seletores VIP)
@@ -113,14 +112,14 @@
         return 'jpg';
     }
 
-    // FUNÇÃO MOTOR: Baixa a imagem via XMLHttpRequest (burlar bloqueios) e só depois salva na fila global
+    // FUNÃ‡ÃƒO MOTOR: Baixa a imagem via XMLHttpRequest (burlar bloqueios) e sÃ³ depois salva na fila global
     function gerenciarDownloadESalvamento(urlImagem, urlPagina, idExtraido, nomeLocalArquivo, caminhoCompletoImagem, proximaAcao) {
         if (urlImagem === 'Nenhuma imagem encontrada') {
             gravarNaFilaGlobal('SEM IMAGEM');
             return;
         }
 
-        // Força cabeçalhos válidos da loja para o servidor liberar o download 100% limpo
+        // ForÃ§a cabeÃ§alhos vÃ¡lidos da loja para o servidor liberar o download 100% limpo
         GM_xmlhttpRequest({
             method: "GET",
             url: urlImagem,
@@ -133,7 +132,7 @@
                 if (response.status >= 200 && response.status < 300 && response.response) {
                     let blobUrl = URL.createObjectURL(response.response);
 
-                    // Entrega o arquivo binário direto para o gerenciador do navegador
+                    // Entrega o arquivo binÃ¡rio direto para o gerenciador do navegador
                     GM_download({
                         url: blobUrl,
                         name: caminhoCompletoImagem,
@@ -157,7 +156,7 @@
             ontimeout: function() {
                 gravarNaFilaGlobal('ERRO: Tempo limite esgotado');
             },
-            timeout: 6000 // Limite de 6 segundos por imagem para não travar seu fluxo
+            timeout: 6000 // Limite de 6 segundos por imagem para nÃ£o travar seu fluxo
         });
 
         function gravarNaFilaGlobal(resultadoNomeArquivo) {
@@ -174,11 +173,11 @@
         }
     }
 
-    // Função interna para gerar o arquivo CSV consolidado
+    // FunÃ§Ã£o interna para gerar o arquivo CSV consolidado
     function gerarCsvFinal(filaCompleta) {
         let idParaNomeArquivo = '';
         filaCompleta.forEach(item => {
-            if (item.idProduto && item.idProduto !== 'ID não encontrado' && item.idProduto !== '') {
+            if (item.idProduto && item.idProduto !== 'ID nÃ£o encontrado' && item.idProduto !== '') {
                 idParaNomeArquivo = item.idProduto;
             }
         });
@@ -187,7 +186,7 @@
         let caminhoCompletoCsv = `AbasSalvas/${nomeFinalCsv}`;
 
         let csvContent = "\uFEFF";
-        csvContent += "Link da Pagina;Link da Imagem;Nome do Arquivo Salvo;ID (MadeiraMadeira)\n";
+        csvContent += "Page URL;Image URL;Saved File Name;Product ID\n";
 
         filaCompleta.forEach(item => {
             let urlPagTratada = item.urlPagina.replace(/"/g, '""');
@@ -217,7 +216,7 @@
         if (document.getElementById(ID_BOTAO_PAINEL)) {
             let fila = GM_getValue('FILA_CSV_GLOBAL', []);
             const txt = document.getElementById('tm-status-text');
-            if (txt) txt.innerText = `📋 Fila: ${fila.length} itens`;
+            if (txt) txt.innerText = `ðŸ“‹ Fila: ${fila.length} itens`;
             return;
         }
 
@@ -228,18 +227,18 @@
         const statusFila = document.createElement('div');
         statusFila.id = 'tm-status-text';
         statusFila.style = "font-weight:bold; text-align:center; font-size:14px;";
-        statusFila.innerText = '📋 Fila: 0 itens';
+        statusFila.innerText = 'ðŸ“‹ Fila: 0 itens';
         painel.appendChild(statusFila);
 
         const btnAdicionar = document.createElement('button');
         btnAdicionar.id = 'tm-btn-adicionar';
-        btnAdicionar.innerText = '➕ Adicionar (Teclado: Insert)';
+        btnAdicionar.innerText = 'âž• Adicionar (Teclado: Insert)';
         btnAdicionar.style = "padding:8px; background-color:#3498db; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;";
         painel.appendChild(btnAdicionar);
 
         const btnSalvar = document.createElement('button');
         btnSalvar.id = 'tm-btn-salvar';
-        btnSalvar.innerText = '💾 Baixar CSV e Fechar (Teclado: End)';
+        btnSalvar.innerText = 'ðŸ’¾ Baixar CSV e Fechar (Teclado: End)';
         btnSalvar.style = "padding:8px; background-color:#2ecc71; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;";
         painel.appendChild(btnSalvar);
 
@@ -247,22 +246,22 @@
 
         // CLIQUE: Inserir na Fila
         btnAdicionar.addEventListener('click', function() {
-            btnAdicionar.innerText = '⏳ Baixando...';
+            btnAdicionar.innerText = 'â³ Baixando...';
             btnAdicionar.disabled = true;
 
             let urlPagina = window.location.href;
             let urlImagem = obterMaiorImagem();
-            let idExtraido = buscarIdMadeira();
+            let idExtracted = fetchProductId();
             let nomeLocalArquivo = `IMG_${Date.now()}_${Math.floor(Math.random() * 1000)}.${obterExtensao(urlImagem)}`;
 
-            gerenciarDownloadESalvamento(urlImagem, urlPagina, idExtraido, nomeLocalArquivo, `AbasSalvas/${nomeLocalArquivo}`, function() {
-                window.close(); // Só fecha quando a função terminar de gravar com sucesso
+            gerenciarDownloadESalvamento(urlImagem, urlPagina, idExtracted, nomeLocalArquivo, `AbasSalvas/${nomeLocalArquivo}`, function() {
+                window.close(); // SÃ³ fecha quando a funÃ§Ã£o terminar de gravar com sucesso
             });
         });
 
         // CLIQUE: Exportar CSV final
         btnSalvar.addEventListener('click', function() {
-            btnSalvar.innerText = '⏳ Concluindo...';
+            btnSalvar.innerText = 'â³ Concluindo...';
             btnSalvar.disabled = true;
 
             let fila = GM_getValue('FILA_CSV_GLOBAL', []);
@@ -273,11 +272,11 @@
             } else {
                 let urlPagina = window.location.href;
                 let urlImagem = obterMaiorImagem();
-                let idExtraido = buscarIdMadeira();
+                let idExtracted = fetchProductId();
                 let nomeLocalArquivo = `IMG_${Date.now()}_${Math.floor(Math.random() * 1000)}.${obterExtensao(urlImagem)}`;
 
-                // Baixa a foto da última aba antes de gerar o relatório mestre
-                gerenciarDownloadESalvamento(urlImagem, urlPagina, idExtraido, nomeLocalArquivo, `AbasSalvas/${nomeLocalArquivo}`, function() {
+                // Baixa a foto da Ãºltima aba antes de gerar o relatÃ³rio mestre
+                gerenciarDownloadESalvamento(urlImagem, urlPagina, idExtracted, nomeLocalArquivo, `AbasSalvas/${nomeLocalArquivo}`, function() {
                     let filaAtualizada = GM_getValue('FILA_CSV_GLOBAL', []);
                     gerarCsvFinal(filaAtualizada);
                 });

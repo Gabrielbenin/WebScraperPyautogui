@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         2 - MadeiraMadeira - Auto Google Lens (FOCADO NO PRODUTO)
+// @name         Product Scraper - Auto Google Lens (Image Focused)
 // @namespace    http://tampermonkey.net/
 // @version      2.1
-// @description  Copia a imagem PRINCIPAL DO PRODUTO e abre o Google Lens
-// @author       Você
-// @match        https://*.madeiramadeira.com.br/*
+// @description  Extracts the main product image and opens Google Lens for visual competitor search
+// @author       You
+// @match        https://*/*
 // @grant        GM_setClipboard
 // ==/UserScript==
 
@@ -20,8 +20,8 @@
 
         let imagemProdutoValida = null;
 
-        // ESTRATÉGIA DE BUSCA AGRESSIVA (Priorizando seletores de carrossel de produto)
-        // Estes são seletores comuns em carrosséis da MM que contêm a foto principal.
+        // AGGRESSIVE SEARCH STRATEGY (Prioritizing product carousel selectors)
+        // These are common selectors in e-commerce product carousels that contain the main photo.
         const seletoresAlvo = [
             // Imagem principal ativa no carrossel grande
             '.slick-active.slick-current [data-testid="product-image"] img',

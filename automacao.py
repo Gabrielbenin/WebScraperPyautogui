@@ -1,24 +1,24 @@
-"""
-Automacao de Pesquisa de Concorrentes - MadeiraMadeira
-======================================================
+﻿"""
+E-commerce Competitor Research Automation
+=========================================
 
-Este script automatiza o processo manual de:
-1. Abrir links de produtos da MadeiraMadeira a partir de uma planilha Google Sheets
-2. Esperar as extensoes Tampermonkey fazerem a busca no Google Lens e abrir concorrentes
-3. Processar cada aba com Insert (baixar imagem) e End (exportar CSV na ultima aba)
-4. Voltar ao Sheets e repetir com o proximo produto
+This script automates the manual process of:
+1. Opening product links from a Google Sheets spreadsheet
+2. Waiting for Tampermonkey extensions to trigger Google Lens search and open competitor tabs
+3. Processing each tab with Insert (download image) and End (export CSV on the last tab)
+4. Returning to Sheets and repeating for the next product
 
-USO:
+USAGE:
     python automacao.py
 
-CONTROLES:
-    - ESC: Para a automacao a qualquer momento
-    - O script inicia apos uma contagem regressiva de 5 segundos (tempo para focar no navegador)
+CONTROLS:
+    - ESC: Stop the automation at any time
+    - The script starts after a 5-second countdown (time to focus on the browser)
 
-PRE-REQUISITOS:
-    - Google Sheets aberto na aba 1 (mais a esquerda) do navegador
-    - Cursor na celula do primeiro link do produto
-    - Extensoes Tampermonkey ativas e funcionando
+PREREQUISITES:
+    - Google Sheets open in tab 1 (leftmost) of the browser
+    - Cursor on the cell with the first product link
+    - Tampermonkey extensions active and working
     - pip install pyautogui keyboard pygetwindow
 """
 
@@ -39,7 +39,7 @@ if sys.stdout.encoding != 'utf-8':
 # ============================================================================
 
 # Tempo (em segundos) para esperar as extensoes Tampermonkey terminarem.
-# Inclui: abrir MadeiraMadeira -> Google Lens -> abrir concorrentes -> fechar invalidas
+# Inclui: open product page -> Google Lens -> abrir concorrentes -> fechar invalidas
 WAIT_EXTENSIONS = 48
 
 # Tempo (em segundos) apos apertar Insert/End para a aba baixar a imagem e fechar
@@ -211,7 +211,7 @@ def count_tabs_to_process():
 
         if is_sheets_active():
             # Chegou no Sheets, contagem concluida
-            total = tabs_after_current + 1  # +1 para incluir a aba inicial (MadeiraMadeira)
+            total = tabs_after_current + 1  # +1 to include the initial tab (product page)
             return total
 
         tabs_after_current += 1
@@ -226,11 +226,11 @@ def count_tabs_to_process():
 
 def process_tabs():
     """
-    Processa todas as abas abertas (MadeiraMadeira + concorrentes).
+    Processes all open tabs (product page + competitors).
 
     Fluxo:
     1. Conta abas fazendo Ctrl+Tab ate chegar no Sheets
-    2. Do Sheets, Ctrl+Tab para ir para a MadeiraMadeira (1a aba a processar)
+    2. From Sheets, Ctrl+Tab to go to the product page (1st tab to process)
     3. Insert nas primeiras N-1 abas, End na ultima
 
     Retorna o numero de abas processadas, ou -1 se interrompido.
@@ -248,7 +248,7 @@ def process_tabs():
 
     print_step(f"{total_tabs} aba(s) para processar.")
 
-    # Passo 2: Estamos no Sheets. Ctrl+Tab para ir para a MadeiraMadeira
+    # Step 2: We are on Sheets. Ctrl+Tab to go to the product tab
     pyautogui.hotkey('ctrl', 'tab')
     safe_sleep(1)
 
